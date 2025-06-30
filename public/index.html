@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Patient Registration</title>
+    <style>
+         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #fdfbfb, #ebedee);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #2c3e50;
+        }
+
+        nav {
+            margin: 20px 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            color: #007BFF;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #0056b3;
+        }
+
+        form {
+            display: inline-block;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+            text-align: left;
+            width: 300px;
+        }
+
+        label {
+            margin-top: 15px;
+            display: block;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input, select {
+            display: block;
+            margin-top: 8px;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007BFF;
+        }
+
+        button {
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Register Patient</h2>
+    <nav>
+        <a href="index.html">Register</a> |
+        <a href="treatment.html">Treatment</a> |
+        <a href="admin-login.html">Admin</a> |
+        <a href="nurse.html">Nurse</a> |
+        <a href="history.html">History</a>
+      </nav>
+      
+    <form id="registerForm">
+        <label>FullName :</label><br>
+        <input type="text" id="fullName" placeholder="Full Name" required>
+        <label>Email :</label><br>
+        <input type="email" id="email" placeholder="Email" required><br>
+         <label>Phone Number :</label><br>
+        <input type="text" id="phone" placeholder="Phone Number" required><br>
+         <label>Patient :</label><br>
+        <input type="text" id="patientId" placeholder="Patient ID" required><br>
+         <label>Age :</label><br>
+        <input type="number" id="age" placeholder="Age" required><br>
+        <select id="gender">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+        </select>
+         <label>Doctor Room Number :</label><br>
+        <input type="text" id="doctorRoom" placeholder="Doctor Room Number" required><br>
+         <label>Home Address:</label><br>
+        <input type="text" id="homeAddress" placeholder="Home Address" required>
+        <button type="submit">Register</button>
+    </form>
+
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const data = {
+                fullName: document.getElementById("fullName").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                patientId: document.getElementById("patientId").value,
+                age: document.getElementById("age").value,
+                gender: document.getElementById("gender").value,
+                doctorRoom: document.getElementById("doctorRoom").value,
+                homeAddress: document.getElementById("homeAddress").value,
+            };
+
+            const response = await fetch("/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        });
+    </script>
+</body>
+</html>

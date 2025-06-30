@@ -1,0 +1,82 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <title>Hospital Patient History</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 90%; margin: auto; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid black; text-align: left; }
+        th { background-color: lightgray; }
+        .green { background-color: lightgreen; }
+        .red { background-color: lightcoral; }
+    </style>
+</head>
+<body>
+    <h2>Hospital Patient History</h2>
+    <nav>
+        <a href="index.html">Register</a> |
+        <a href="treatment.html">Treatment</a> |
+        <a href="hospital.html">Admin</a> |
+        <a href="nurse.html">Nurse</a> |
+        <a href="history.html">History</a>
+    </nav>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Patient ID</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Medicine</th>
+                <th>Dose</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="historyTable"></tbody>
+    </table>
+
+    <script>
+        async function loadHistory() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Please login to view this page.");
+                window.location.href = "hlogin.html";
+                return;
+            }
+
+            const response = await fetch("/history", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 401) {
+                alert("Session expired. Please login again.");
+                window.location.href = "hlogin.html";
+                return;
+            }
+
+            const patients = await response.json();
+            const table = document.getElementById("historyTable");
+            table.innerHTML = "";
+
+            patients.forEach(patient => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${patient.fullName}</td>
+                    <td>${patient.patientId}</td>
+                    <td>${patient.email}</td>
+                    <td>${patient.phone}</td>
+                    <td>${patient.disease || "N/A"}</td>
+                    <td>${patient.dose || "N/A"}</td>
+                    <td class="${patient.stay === "hospital" ? "green" : "red"}">${patient.stay === "hospital" ? "Inpatient" : "Discharged"}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Login</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #fdfbfb, #ebedee);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        form {
+            display: inline-block;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 80px;
+            text-align: left;
+            width: 300px;
+        }
+        label {
+            margin-top: 15px;
+            display: block;
+            font-weight: 600;
+            color: #444;
+        }
+        input {
+            display: block;
+            margin-top: 8px;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007BFF;
+        }
+        button {
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+        <label>Username:</label>
+        <input type="text" id="username" required>
+        <label>Password:</label>
+        <input type="password" id="password" required>
+        <button type="submit">Login</button>
+        <div class="error" id="errorMsg"></div>
+    </form>
+    <script>
+        document.getElementById("adminLoginForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            try {
+                const response = await fetch("/admin-login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    window.location.href = "hospital.html";
+                } else {
+                    document.getElementById("errorMsg").textContent = "Invalid username or password.";
+                }
+            } catch (err) {
+                document.getElementById("errorMsg").textContent = "Server error. Try again.";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!html lang="en">
+<head>
+    <title>Doctor Treatment Form</title>
+    <style>
+         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #333;
+        }
+
+        nav {
+            margin: 20px 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            color: #007BFF;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #0056b3;
+        }
+
+        form {
+            display: inline-block;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+            text-align: left;
+            width: 300px;
+        }
+
+        label {
+            margin-top: 2px;
+            display: block;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input, select {
+            display: block;
+            margin-top: 3px;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007BFF;
+        }
+
+        button {
+            margin-top: 4px;
+            background-color: #28a745;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h2>Doctor Treatment Form</h2><nav>
+        <a href="index.html">Register</a> |
+        <a href="treatment.html">Treatment</a> |
+        <a href="hospital.html">Admin</a> |
+        <a href="nurse.html">Nurse</a> |
+        <a href="history.html">History</a>
+      </nav>
+      
+    <form id="treatmentForm">
+        <label>Patient ID</label><br>
+        <input type="text" id="patientId" placeholder="Patient ID" required><br>
+        <label>Doctor ID</label><br>
+        <input type="text" id="doctorId" placeholder="Doctor ID" required><br>
+        <label>Dose Name</label><br>
+        <input type="text" id="disease" placeholder="Dose Name" required><br>
+        <label>Dose Description</label><br>
+        <input type="text" id="dose" placeholder="Dose Description (e.g., 1x3, 2x2)" required><br>
+        <label>Treatment End Date</label><br>
+        <input type="date" id="treatmentEnd" placeholder="Treatment End Date" required><br>
+        <label>Bed Number (If Inpatient)</label><br>
+        <input type="text" id="bedNumber" placeholder="Bed Number (If  Inpatient)"><br>
+        <label>Patient status</label><br>
+        <select id="stay">
+            <option value="home">Discharged</option>
+            <option value="hospital">Inpatient</option>
+        </select>
+ <label>ward Number</label><br>
+        <input type="text" id="wardNumber" placeholder="Ward Number (If Staying in Hospital)"><br>
+        <button type="submit">Submit Treatment</button>
+    </form>
+
+    <script>
+        document.getElementById("treatmentForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const data = {
+    patientId: document.getElementById("patientId").value,
+    doctorId: document.getElementById("doctorId").value,
+    disease: document.getElementById("disease").value,
+    dose: document.getElementById("dose").value,
+    treatmentEnd: document.getElementById("treatmentEnd").value,
+    stay: document.getElementById("stay").value,
+    wardNumber: document.getElementById("wardNumber").value,
+    bedNumber: document.getElementById("bedNumber").value,
+};
+
+            const response = await fetch("/treatment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        });
+    </script>
+</body>
+</html>
+

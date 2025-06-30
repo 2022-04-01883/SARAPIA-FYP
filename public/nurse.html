@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nurse Dashboard - Dose Monitoring</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    button {
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .done {
+      color: green;
+      font-weight: bold;
+    }
+    .nodose {
+      color: gray;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h2>Nurse Dashboard - Patient Dose Status</h2>
+  <table id="patient-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Ward</th>
+        <th>Bed</th>
+        <th>Dose</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="patient-body">
+      <!-- Data will be inserted here -->
+    </tbody>
+  </table>
+
+  <script>
+    function fetchPatients() {
+      fetch("/nurse-dashboard")
+        .then(res => res.json())
+        .then(patients => {
+          const tbody = document.getElementById("patient-body");
+          tbody.innerHTML = "";
+
+          patients.forEach(p => {
+            const row = document.createElement("tr");
+
+            let actionCell = "";
+            if (p.dueNow && !p.dosed) {
+              actionCell = `
+                <button onclick="markDosed('${p._id}')">
+                  🔴 Reminder
+                </button>
+              `;
+            } else if (p.dosed) {
+              actionCell = `<span class="done">✅ Dose Done</span>`;
+            } else {
+              actionCell = `<span class="nodose">No Dose Now</span>`;
+            }
+
+            row.innerHTML = `
+              <td>${p.fullName}</td>
+              <td>${p.wardNumber}</td>
+              <td>${p.bedNumber}</td>
+              <td>${p.dose}</td>
+              <td id="status-${p._id}">${actionCell}</td>
+            `;
+
+            tbody.appendChild(row);
+          });
+        });
+    }
+
+    function markDosed(id) {
+      fetch(`/mark-dosed/${id}`, {
+        method: "POST",
+      })
+      .then(res => res.json())
+      .then(() => {
+        const statusCell = document.getElementById(`status-${id}`);
+        statusCell.innerHTML = `<span class="done">✅ Dose Done</span>`;
+      });
+    }
+
+    // Initial load
+    fetchPatients();
+
+    // Optional: refresh every 60 seconds
+    setInterval(fetchPatients, 60000);
+  </script>
+</body>
+</html>

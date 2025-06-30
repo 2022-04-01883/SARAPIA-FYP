@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Hospital Patient Management</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f8fb;
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      color: #004085;
+      margin-bottom: 10px;
+    }
+
+    nav, .logout-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    a {
+      display: inline-block;
+      margin: 0 5px;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .logout-btn {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .logout-btn:hover {
+      background-color: #5a6268;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      background-color: #ffffff;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid #e1e7ec;
+      text-align: center;
+    }
+
+    th {
+      background-color: #e9f2f9;
+      color: #004085;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9fcfe;
+    }
+
+    tr:hover {
+      background-color: #f1f9ff;
+    }
+
+    input {
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .update-btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .update-btn:hover {
+      background-color: #218838;
+    }
+
+    .delete-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <h2>Hospital Dashboard — Manage Patients</h2>
+  <div class="logout-container">
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <nav>
+    <a href="index.html">Register</a> |
+    <a href="treatment.html">Treatment</a> |
+    <a href="hospital.html">Admin</a> |
+    <a href="nurse.html">Nurse</a> |
+    <a href="history.html">History</a>
+  </nav>
+
+  <table id="patientTable">
+    <thead>
+      <tr>
+        <th>Full Name</th><th>Email</th><th>Phone</th><th>Patient ID</th>
+        <th>Age</th><th>Gender</th><th>Doctor Room</th><th>Home Address</th>
+        <th>Update</th><th>Delete</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchPatients() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must be logged in to access this page.");
+        window.location.href = "hlogin.html";
+        return;
+      }
+
+      const res = await fetch("/history", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (res.status === 401) {
+        alert("Session expired. Please login again.");
+        localStorage.removeItem("token");
+        window.location.href = "hlogin.html";
+        return;
+      }
+
+      const patients = await res.json();
+      const tbody = document.querySelector("#patientTable tbody");
+      tbody.innerHTML = "";
+
+      patients.forEach((patient) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><input value="${patient.fullName || ''}"></td>
+          <td><input value="${patient.email || ''}"></td>
+          <td><input value="${patient.phone || ''}"></td>
+          <td><input value="${patient.patientId || ''}" disabled></td>
+          <td><input value="${patient.age || ''}"></td>
+          <td><input value="${patient.gender || ''}"></td>
+          <td><input value="${patient.doctorRoom || ''}"></td>
+          <td><input value="${patient.homeAddress || ''}"></td>
+          <td><button class="update-btn">Update</button></td>
+          <td><button class="delete-btn">Delete</button></td>
+        `;
+
+        const inputs = row.querySelectorAll("input");
+
+        row.querySelector(".update-btn").onclick = async () => {
+          const data = {
+            fullName: inputs[0].value,
+            email: inputs[1].value,
+            phone: inputs[2].value,
+            age: inputs[4].value,
+            gender: inputs[5].value,
+            doctorRoom: inputs[6].value,
+            homeAddress: inputs[7].value,
+          };
+          const response = await fetch(`/update/${patient._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+          const result = await response.json();
+          alert(result.message || "Updated successfully");
+        };
+
+        row.querySelector(".delete-btn").onclick = async () => {
+          if (confirm("Are you sure you want to delete this patient?")) {
+            const response = await fetch(`/delete/${patient._id}`, { method: "DELETE" });
+            const result = await response.json();
+            alert(result.message || "Deleted successfully");
+            fetchPatients(); // Refresh table
+          }
+        };
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.href = "hlogin.html";
+    }
+
+    fetchPatients();
+  </script>
+</body>
+</html>
